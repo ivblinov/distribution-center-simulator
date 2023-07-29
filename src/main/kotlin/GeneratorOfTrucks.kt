@@ -6,12 +6,12 @@ import trucks.Truck
 
 object GeneratorOfTrucks {
 
-/*    fun CoroutineScope.generate() = launch {
+    fun CoroutineScope.generate() = launch {
         val producer = produceTruck()
         repeat(5) { launchProcessor(it, producer) }
         delay(950)
         producer.cancel() // cancel producer coroutine and thus kill them all
-    }*/
+    }
 
     @OptIn(ExperimentalCoroutinesApi::class)
     fun CoroutineScope.produceTruck() = produce<Truck> {
