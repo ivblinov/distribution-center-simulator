@@ -1,29 +1,38 @@
 
 import kotlinx.coroutines.channels.*
 import kotlinx.coroutines.*
+import trucks.AverageTruck
 import trucks.BigTruck
+import trucks.MiniTruck
 import trucks.Truck
+import kotlin.random.Random
 
 object GeneratorOfTrucks {
 
-    fun CoroutineScope.generate() = launch {
-        val producer = produceTruck()
-        repeat(5) { launchProcessor(it, producer) }
-        delay(950)
-        producer.cancel() // cancel producer coroutine and thus kill them all
+
+
+    suspend fun generate(interval: Long) {
+        val coroutineContext = Dispatchers.IO + Job()
+        val coroutineScope = CoroutineScope(coroutineContext)
+        coroutineScope.launch {
+            val producer = produceTruck(interval)
+            while (true) {
+                producer
+                delay(2000)
+            }
+        }
     }
 
     @OptIn(ExperimentalCoroutinesApi::class)
-    fun CoroutineScope.produceTruck() = produce<Truck> {
+    fun CoroutineScope.produceTruck(interval: Long) = produce {
         while (true) {
-            send(BigTruck()) // produce next
-            delay(100) // wait 0.1s
+            send(randomTruck())
+            delay(interval)
         }
     }
 
-    fun CoroutineScope.launchProcessor(id: Int, channel: ReceiveChannel<Truck>) = launch {
-        for (msg in channel) {
-            println("Processor #$id received $msg")
-        }
+    private fun randomTruck(): Truck {
+        val trucks = arrayOf(AverageTruck(), BigTruck(), MiniTruck())
+        return trucks[Random.nextInt(0, 3)]
     }
 }

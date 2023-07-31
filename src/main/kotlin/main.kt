@@ -2,6 +2,7 @@
 import kotlinx.coroutines.*
 import kotlinx.coroutines.channels.*
 
+
 suspend fun main() {
-    val generator = GeneratorOfTrucks.generate()
+    GeneratorOfTrucks.generate(1000)
 }
