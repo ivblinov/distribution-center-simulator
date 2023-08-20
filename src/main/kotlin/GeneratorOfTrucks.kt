@@ -37,7 +37,7 @@ object GeneratorOfTrucks {
     @OptIn(ExperimentalCoroutinesApi::class)
     fun CoroutineScope.produceTruck(interval: Long) = produce {
         while (true) {
-            send(randomTruck())
+            send(loadTheTruck())
             delay(interval)
         }
     }
@@ -56,7 +56,7 @@ object GeneratorOfTrucks {
         }
     }
 
-    fun randomGoods() = when (Random.nextInt(0, 12)) {
+    private fun randomGoods(number: Int) = when (number) {
         0 -> Beds()
         1 -> Bikes()
         2 -> Furniture()
@@ -69,5 +69,22 @@ object GeneratorOfTrucks {
         9 -> Computer()
         10 -> Microwave()
         else -> TV()
+    }
+
+    fun loadTheTruck(): Truck {
+        val truck = randomTruck()
+        while (true) {
+            val numberRandomGood = Random.nextInt(0, 12)
+            val goods = randomGoods(numberRandomGood)
+            val freePlace = truck.loadCapacity - truck.currentCargoWeight
+            val amount = Random.nextInt(1, truck.loadCapacity / goods.weight)
+            if (freePlace < (amount * goods.weight)) break
+            repeat(amount) {
+                val goodForLoading = randomGoods(numberRandomGood)
+                truck.truckBody.add(goodForLoading)
+                truck.currentCargoWeight += goodForLoading.weight
+            }
+        }
+        return truck
     }
 }
